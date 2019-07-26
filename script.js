@@ -756,7 +756,7 @@ ImageTracer = new ImageTracer();
 
 ImageTracer.imageToSVG(
 
-	'testimages/1.jpg', /* input filename / URL */
+	'testimages/6.jpg', /* input filename / URL */
 	
 	function(svgstr){ ImageTracer.appendSVGString( svgstr, 'Container' ); }, /* callback function to run on SVG string result */
 	
