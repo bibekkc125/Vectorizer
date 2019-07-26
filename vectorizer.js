@@ -58,7 +58,7 @@ class Vectorizer{
         
         this.ctx.drawImage(this.image,0,0,this.canvas.width,this.canvas.height);
         this.imgData = this.ctx.getImageData(0,0,this.canvas.width, this.canvas.height);   
-        console.log(this.imgData.data);
+
     }
 
     //create color palette from image
@@ -72,12 +72,10 @@ class Vectorizer{
             for (let i=0; i<p; i++){
                 
                 index = Math.floor( ( ((j+1)*gridy)*this.image.width)+((i+1)*gridx) ) * 4;
-                console.log({r: this.imgData.data[index], g:this.imgData.data[index+1], b:this.imgData.data[index+2], a:this.imgData.data[index+3]});
                 palette.push({r: this.imgData.data[index], g:this.imgData.data[index+1], b:this.imgData.data[index+2], a:this.imgData.data[index+3]});
             }
         }
       
-        console.log(palette);
         return palette;
         
     }
@@ -91,23 +89,22 @@ class Vectorizer{
         this.indexedColor = [];
 
         //set indexedColor array to -1
-        for (let j = 0; j < this.image.height + 2; j++){
+        for (let j = 0; j < this.imgData.height + 2; j++){
             this.indexedColor[j] = [];
-            for(let i = 0; i < this.image.width + 2; i++){
+            for(let i = 0; i < this.imgData.width + 2; i++){
                 this.indexedColor[j][i] = -1;
             }
         }
         //Clustering of kMean number of times
         for (let a= 0; a < this.kMean ; a++){
             for( let i=0; i < palette.length; i++){
-                paletteAvg[i] = {r:0, g:0, b:0, a:0, n:0};
-                console.log()
+                paletteAvg[i] = {r:0, g:0, b:0, a:0, n:0};  
             }
             if (a>0){
                 //Average colors to form a color palette
-                for(let k = 0 ; k < this.palette.length ; k++){
-                    if (this.palette[k].n > 0){
-                        this.palette[k] = {
+                for(let k = 0 ; k < palette.length ; k++){
+                    if (palette[k].n > 0){
+                        palette[k] = {
                             r: Math.floor( paletteAvg[k].r / paletteAvg[k].n ),
                             g: Math.floor( paletteAvg[k].g / paletteAvg[k].n ),
                             b: Math.floor( paletteAvg[k].b / paletteAvg[k].n ),
@@ -116,10 +113,10 @@ class Vectorizer{
                     }
                 }
             }
-            for(let j = 0; j < this.image.height; j++){
-                for(let i = 0; i < this.image.width; i++){
+            for(let j = 0; j < this.imgData.height; j++){
+                for(let i = 0; i < this.imgData.width; i++){
 
-                    let index = (j * this.image.width + i) * 4;
+                    let index = (j * this.imgData.width + i) * 4;
                     currIdx = 0, maxDist = 1024;
 
                     //calculating euclidean distance between each pixel and palette colors
@@ -146,6 +143,7 @@ class Vectorizer{
                 }
             }
         }
+        return palette;
         
     }
 
@@ -570,7 +568,6 @@ class Vectorizer{
 		
 		// Closing path element
         str += ` />`;
-        
         return str;
 
     }
@@ -593,7 +590,6 @@ class Vectorizer{
 		}// End of layers loop
 		
         svgstr += '</svg>';
-        // console.log(svgstr);
 		return svgstr;
     }
     
@@ -612,7 +608,7 @@ class Vectorizer{
 
         let traceData = {
             layers: [],
-            palette: this.palette,
+            palette: this.colorQuantization(),
             width: this.indexedColor[0].length - 2,
             height: this.indexedColor.length - 2
         };
